@@ -32,7 +32,7 @@ Allows saving files directly to disk. Ensure you have PHP installed.
 - No backend required. Changes are saved to Browser LocalStorage.
 - Upload files to any static host (GitHub Pages, Netlify).
 - Open index.html
-- Use here (todo, insert link once repo published)
+- Use [here](http://vs.digital/SVG-Colorizer/).
 
 ## Tips
 
