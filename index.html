@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Colorizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="palette-panel">
+    <h3 style="margin:0 0 5px 0; font-size:14px; color:var(--accent);">SVG Canvas</h3>
+    <div style="font-size:11px; opacity:0.6; margin-bottom:10px;">
+        Wheel: Zoom • Drag: Pan<br>
+        <strong>Space</strong>: Pan • <strong>[1-9]</strong>: Colors<br>
+        <strong>D</strong>: Del Mode • <strong>C</strong>: View CSS<br>
+        Alt+Click: Delete Element
+    </div>
+    
+    <div class="palette-header">
+        <span style="font-size:12px; opacity:0.8;">Palette</span>
+        <button class="icon-btn" onclick="app.editPalette()" title="Edit Palette JSON">✏️</button>
+    </div>
+    <div class="palette-grid" id="palette"></div>
+    
+    <div class="tools">
+        <!-- Aspect Ratio -->
+        <div class="input-group">
+            <label for="ar-input">Ratio</label>
+            <input type="number" id="ar-input" class="ar-input" value="1" step="0.1" title="Target Aspect Ratio (Width/Height)">
+        </div>
+
+        <!-- Polling Toggle (Hidden by default) -->
+        <div class="input-group" id="polling-group" style="display:none;">
+            <label for="poll-check" style="cursor:pointer; display:flex; align-items:center; gap:5px;">
+                <input type="checkbox" id="poll-check"> Poll Disk
+            </label>
+        </div>
+
+        <button class="tool-btn primary" title="Ctrl+S" onclick="app.saveFile()">💾 Save Selected</button>
+        <button class="tool-btn primary" onclick="app.saveAllFiles()">💾 Save All</button>
+        <button class="tool-btn" title="Ctrl+Z" onclick="app.undo()">↩ Undo</button>
+        <button id="btn-delete" title="Hotkey: D" class="tool-btn" onclick="app.toggleDeleteMode()">🗑️ Del Mode</button>
+        <button class="tool-btn" title="Hotkey: C" onclick="app.showCss()">View CSS</button>
+        <button class="tool-btn" onclick="app.assignColorVariables()">Assign Vars</button>
+    </div>
+    
+    <div id="backend-indicator"></div>
+</div>
+
+<div id="status-bar">Ready</div>
+
+<div id="viewport">
+    <div id="world"></div>
+</div>
+
+<!-- CSS Viewer Modal -->
+<div id="modal-css" class="modal-overlay">
+    <div class="modal">
+        <h2>Generated CSS</h2>
+        <textarea id="css-output" readonly></textarea>
+        <div class="modal-footer">
+            <button class="tool-btn" onclick="app.closeModals()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Palette Editor Modal -->
+<div id="modal-palette" class="modal-overlay">
+    <div class="modal" style="width: 400px;">
+        <h2>Edit Palette</h2>
+        
+        <div class="palette-editor-ui">
+            <div id="palette-list" class="palette-list"></div>
+            
+            <div class="palette-add-row">
+                <input type="text" id="new-color-name" placeholder="Name (e.g. blue)" class="input-sm">
+                <input type="color" id="new-color-hex" value="#000000" class="input-color">
+                <button class="tool-btn small" onclick="app.addPaletteColor()">Add</button>
+            </div>
+        </div>
+
+        <details style="margin-top:15px; font-size:12px;">
+            <summary style="cursor:pointer; opacity:0.7;">Advanced: Edit JSON</summary>
+            <textarea id="palette-input" style="margin-top:5px; height:100px;"></textarea>
+        </details>
+
+        <div class="modal-footer">
+            <button class="tool-btn" onclick="app.closeModals()">Close</button>
+            <button class="tool-btn primary" onclick="app.savePaletteJson()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
