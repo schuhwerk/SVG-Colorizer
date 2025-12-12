@@ -62,14 +62,22 @@ const app = {
         this.loadPalette();
         this.updateGlobalStyle();
 
-        // Check Backend
-		try {
-			const check = await fetch('api.php?action=list');
-			this.hasBackend = check.ok;
-		} catch (e) {
-			this.hasBackend = false;
-		}
-
+        		// Check Backend
+        		try {
+        			const check = await fetch('api.php?action=list');
+                    if (check.ok) {
+                        try {
+                            const data = await check.json();
+                            this.hasBackend = Array.isArray(data);
+                        } catch (e) {
+                            this.hasBackend = false;
+                        }
+                    } else {
+                        this.hasBackend = false;
+                    }
+        		} catch (e) {
+        			this.hasBackend = false;
+        		}
 		// Setup UI based on backend
 		if (this.hasBackend) {
 			this.els.indicator.textContent = "Backend: PHP (Disk)";
