@@ -55,7 +55,8 @@ const app = {
 		arInput: document.getElementById('ar-input'),
 		indicator: document.getElementById('backend-indicator'),
 		pollCheck: document.getElementById('poll-check'),
-		pollGroup: document.getElementById('polling-group')
+		pollGroup: document.getElementById('polling-group'),
+		showNamesCheck: document.getElementById('show-filenames-check')
 	},
 
 	async init() {
@@ -144,6 +145,12 @@ const app = {
             this.pollingEnabled = e.target.checked;
         });
 
+        this.els.showNamesCheck.addEventListener('change', (e) => {
+            document.body.classList.toggle('show-filenames', e.target.checked);
+        });
+
+        window.addEventListener('resize', () => this.layoutGrid());
+
         // Drag & Drop
         document.body.addEventListener('dragover', e => this.handleDragOver(e));
         document.body.addEventListener('drop', e => this.handleDrop(e));
@@ -186,6 +193,7 @@ const app = {
                 this.els.status.textContent = `Imported ${file.name}`;
             }
         }
+        this.layoutGrid();
     },
 
     // --- PALETTE MANAGEMENT ---
@@ -327,6 +335,7 @@ const app = {
 				if (isDirty) this.updateCardDirtyState(file.name);
 			});
 			this.els.status.textContent = `Loaded ${data.length} files`;
+            this.layoutGrid();
 
 		} catch (e) {
 			console.error(e);
@@ -334,6 +343,55 @@ const app = {
 			this.renderEmptyState("Error connecting to backend.");
 		}
 	},
+
+    layoutGrid() {
+        const cards = Array.from(this.els.world.querySelectorAll('.svg-card'));
+        if (cards.length === 0) return;
+
+        const gap = 20;
+        const cardWidth = 200;
+        const padding = 100; // Left + Right padding
+
+        const winW = window.innerWidth;
+        const winH = window.innerHeight;
+
+        // Account for Palette Panel
+        const palettePanel = document.getElementById('palette-panel');
+        let paletteOffset = 0;
+        if (palettePanel) {
+            const rect = palettePanel.getBoundingClientRect();
+            if (rect.width > 0) {
+                paletteOffset = rect.right + 20; // 20px buffer
+            }
+        }
+
+        const effectiveW = Math.max(100, winW - paletteOffset);
+        const ratio = effectiveW / winH;
+
+        // Calculate columns based on screen aspect ratio
+        let cols = Math.round(Math.sqrt(cards.length * ratio));
+        if (cols < 1) cols = 1;
+
+        // Calculate required width
+        // padding * 2 + cols * cardWidth + (cols - 1) * gap
+        const requiredWidth = (padding * 2) + (cols * cardWidth) + (Math.max(0, cols - 1) * gap);
+        this.els.world.style.width = `${requiredWidth}px`;
+
+        // Calculate height for centering
+        const rows = Math.ceil(cards.length / cols);
+        const cardHeight = 200;
+        const requiredHeight = (padding * 2) + (rows * cardHeight) + (Math.max(0, rows - 1) * gap);
+
+        // Center view
+        const centerX = paletteOffset + (effectiveW / 2);
+        const centerY = winH / 2;
+        const worldCenterX = requiredWidth / 2;
+        const worldCenterY = requiredHeight / 2;
+
+        this.panX = centerX - (worldCenterX * this.scale);
+        this.panY = centerY - (worldCenterY * this.scale);
+        this.updateTransform();
+    },
 
 	renderEmptyState(msg = null) {
 		this.els.world.innerHTML = `
