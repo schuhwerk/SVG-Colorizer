@@ -341,7 +341,7 @@ const app = {
                 <h3>${msg || "No SVGs Found"}</h3>
                 ${this.hasBackend
 				? "<p>Add .svg files to the <code>/svgs</code> folder.</p>"
-				: "<p>Use PHP mode to load files from disk.</p>"}
+				: "<p>Drop files here.</p>"}
             </div>
         `;
 	},
